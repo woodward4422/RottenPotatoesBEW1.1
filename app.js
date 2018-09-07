@@ -60,6 +60,15 @@ app.use(bodyParser.urlencoded({ extended: true }));
       })
   })
 
+  app.delete('/reviews/:id', function (req, res) {
+    console.log("DELETE review")
+    Review.findByIdAndRemove(req.params.id).then((review) => {
+      res.redirect('/');
+    }).catch((err) => {
+      console.log(err.message);
+    })
+  })
+
   app.get('/reviews/:id/edit', function (req, res) {
     Review.findById(req.params.id, function(err, review) {
       res.render('reviews-edit', {review: review});

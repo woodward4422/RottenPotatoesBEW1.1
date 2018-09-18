@@ -5,9 +5,13 @@ var exphbs = require('express-handlebars');
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/rotten-potatoes', { useMongoClient: true });
 const bodyParser = require('body-parser');
-const reviews = require('./controllers/reviews');
+const Schema = mongoose.Schema
 
-
+const Comment = mongoose.model('Comment', {
+  title: String,
+  content: String,
+  reviewId: { type: Schema.Types.ObjectId, ref: 'Review' }
+});
 
 const Review = mongoose.model('Review', {
     title: String,
@@ -45,11 +49,13 @@ app.use(bodyParser.urlencoded({ extended: true }));
   });
 
   app.get('/reviews/:id', (req, res) => {
-   Review.findById(req.params.id).then((review) => {
-        res.render('reviews-show', { review: review })
-   }).catch((err) => {
-       console.log(err.message);
-   })
+    Review.findById(req.params.id).then(review => {
+      Comment.find({ reviewId: req.params.id }).then(comments => {
+        res.render('reviews-show', { review: review, comments: comments })
+      })
+    }).catch((err) => {
+      console.log(err.message)
+    });
   });
 
   app.put('/reviews/:id', (req, res) => {
@@ -74,6 +80,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
   app.get('/reviews/:id/edit', function (req, res) {
     Review.findById(req.params.id, function(err, review) {
       res.render('reviews-edit', {review: review});
+    })
+  })
+
+
+  app.post('/reviews/comments', function(req,res) {
+    console.log("BEER!!!s")
+    console.log(req.body)
+    Comment.create(req.body).then(comment => {
+      res.redirect(`/reviews/${comment.reviewId}`)
+    }).catch((err) => {
+      console.log(err.message)
+    })
+  })
+
+  app.delete('/reviews/comments/:id', function (req, res) {
+    console.log("DELETE comment")
+    Comment.findByIdAndRemove(req.params.id).then((comment) => {
+      res.redirect(`/reviews/${comment.reviewId}`);
+    }).catch((err) => {
+      console.log(err.message);
     })
   })
 

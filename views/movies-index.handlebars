@@ -1,0 +1,11 @@
+
+
+<h1>Now Playing</h1>
+{{#each movies}}
+  <li>{{this.title}}
+      <a href="/movies/{{this.id}}">
+  <img src="{{this.poster_path}}" alt="HTML tutorial"
+  style="width:42px;height:42px;border:0;">
+</a>
+  </li>
+{{/each}}

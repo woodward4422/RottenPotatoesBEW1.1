@@ -2,6 +2,8 @@ const express = require('express');
 const methodOverride = require('method-override')
 const app = express();
 var exphbs = require('express-handlebars');
+const MovieDb = require('moviedb-promise')
+const moviedb = new MovieDb('fa1e604e4a94f038943c6e3cbfc8f18d')
 const mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/rotten-potatoes', { useMongoClient: true });
 const bodyParser = require('body-parser');
@@ -25,15 +27,22 @@ app.set('view engine','handlebars');
 app.use(bodyParser.urlencoded({ extended: true }));
 
   //Reviews route 
+  // app.get('/', (req, res) => {
+  //  Review.find()
+  //   .then(reviews => {
+  //       res.render('reviews-index', { reviews: reviews});
+  //   })
+  //   .catch(err => {
+  //       console.log(err)
+  //   })
+  // });
+
   app.get('/', (req, res) => {
-   Review.find()
-    .then(reviews => {
-        res.render('reviews-index', { reviews: reviews});
-    })
-    .catch(err => {
-        console.log(err)
-    })
-  });
+    moviedb.miscNowPlayingMovies().then(response => {
+      res.render('movies-index', { movies: response.results });
+    }).catch(console.error)
+  })
+
 
   app.get('/reviews/new', (req, res) => {
     res.render('reviews-new', {});
@@ -102,6 +111,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
       console.log(err.message);
     })
   })
+
+
 
 
   app.listen(3000, () => {

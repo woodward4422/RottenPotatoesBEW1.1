@@ -43,6 +43,25 @@ app.use(bodyParser.urlencoded({ extended: true }));
     }).catch(console.error)
   })
 
+  app.get('/movies/:id', (req, res) => {
+    moviedb.movieInfo({ id: req.params.id }).then(movie => {
+      if (movie.video) {
+        moviedb.movieVideos({ id: req.params.id }).then(videos => {
+          movie.trailer_youtube_id = videos.results[0].key
+          renderTemplate(movie)
+        })
+      } else {
+        renderTemplate(movie)
+      }
+  
+      function renderTemplate(movie)  {
+        res.render('movies-show', { movie: movie });
+      }
+  
+    }).catch(console.error)
+  })
+  
+
 
   app.get('/reviews/new', (req, res) => {
     res.render('reviews-new', {});

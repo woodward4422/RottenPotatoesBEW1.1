@@ -18,7 +18,9 @@ const Comment = mongoose.model('Comment', {
 const Review = mongoose.model('Review', {
     title: String,
     description: String, 
-    movieTitle: String
+    movieTitle: String,
+    movieId:{ type: String, required: true }
+
   });
 
 app.use(methodOverride('_method'))
@@ -63,8 +65,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
   
 
 
-  app.get('/reviews/new', (req, res) => {
-    res.render('reviews-new', {});
+  app.get('/movies/:movieId/reviews/new', (req, res) => {
+    res.render('reviews-new', {movieId: req.params.movieId});
   });
 
   app.post('/reviews', (req, res) => {
@@ -112,15 +114,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
   })
 
 
-  app.post('/reviews/comments', function(req,res) {
-    console.log("BEER!!!s")
+  app.post('/movies/:movieId/reviews', (req, res) => {
     console.log(req.body)
-    Comment.create(req.body).then(comment => {
-      res.redirect(`/reviews/${comment.reviewId}`)
-    }).catch((err) => {
-      console.log(err.message)
-    })
   })
+
+  // app.post('/reviews/comments', function(req,res) {
+  //   console.log("BEER!!!s")
+  //   console.log(req.body)
+  //   Comment.create(req.body).then(comment => {
+  //     res.redirect(`/reviews/${comment.reviewId}`)
+  //   }).catch((err) => {
+  //     console.log(err.message)
+  //   })
+  // })
 
   app.delete('/reviews/comments/:id', function (req, res) {
     console.log("DELETE comment")
